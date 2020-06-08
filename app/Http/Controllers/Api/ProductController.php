@@ -11,6 +11,8 @@ class ProductController extends Controller
 {
     public function index()
     {
-        return ProductResource::collection(Product::all());
+        $products = Product::withFilters()->get();
+
+        return ProductResource::collection($products);
     }
 }
