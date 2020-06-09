@@ -1,3 +1,7 @@
+[!Screenshot](https://quickadminpanel.com/blog/wp-content/uploads/2020/06/Screen-Shot-2020-06-09-at-8.35.30-AM.png)
+
+---
+
 ## How to use
 
 - Clone the repository with __git clone__
