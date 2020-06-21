@@ -1,6 +1,6 @@
 <template>
     <div class="container" :class="{'loading': loading}">
-        <div class="row">
+        <div class="row" v-if="!loading">
             <div class="col-lg-3 mb-4">
                 <h1 class="mt-4">Filters</h1>
 
@@ -68,74 +68,63 @@
         },
 
         mounted() {
-            this.loadCategories();
-            this.loadManufacturers();
-            this.loadPrices();
-            this.loadProducts();
+            this.loadData();
         },
 
         watch: {
             selected: {
                 handler: function () {
-                    this.loadCategories();
-                    this.loadManufacturers();
-                    this.loadPrices();
-                    this.loadProducts();
+                    this.loadData();
                 },
                 deep: true
             }
         },
 
         methods: {
-            loadCategories: function () {
-                axios.get('/api/categories', {
-                        params: _.omit(this.selected, 'categories')
-                    })
-                    .then((response) => {
-                        this.categories = response.data.data;
+            loadData: function () {
+                this.loading = true;
+
+                Promise.all([
+                        this.loadCategories(),
+                        this.loadManufacturers(),
+                        this.loadPrices(),
+                        this.loadProducts(),
+                        false
+                    ])
+                    .then((values) => {
+                        [this.categories, this.manufacturers, this.prices, this.products, this.loading] = values;
                     })
                     .catch(function (error) {
                         console.log(error);
                     });
+            },
+
+            loadCategories: function () {
+                return axios.get('/api/categories', {
+                        params: _.omit(this.selected, 'categories')
+                    })
+                    .then((response) => response.data.data);
             },
 
             loadProducts: function () {
-                axios.get('/api/products', {
+                return axios.get('/api/products', {
                         params: this.selected
                     })
-                    .then((response) => {
-                        this.products = response.data.data;
-                        this.loading = false;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                    .then((response) => response.data.data);
             },
 
             loadManufacturers: function () {
-                axios.get('/api/manufacturers', {
+                return axios.get('/api/manufacturers', {
                         params: _.omit(this.selected, 'manufacturers')
                     })
-                    .then((response) => {
-                        this.manufacturers = response.data.data;
-                        this.loading = false;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                    .then((response) => response.data.data);
             },
 
             loadPrices: function () {
-                axios.get('/api/prices', {
+                return axios.get('/api/prices', {
                         params: _.omit(this.selected, 'prices')
                     })
-                    .then((response) => {
-                        this.prices = response.data;
-                        this.loading = false;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                    .then((response) => response.data);
             }
         }
     }
