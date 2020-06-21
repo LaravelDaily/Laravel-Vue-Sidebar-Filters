@@ -51,91 +51,55 @@
 </template>
 
 <script>
+    import {mapState, mapActions} from 'vuex';
+
     export default {
-        data: function () {
-            return {
-                prices: [],
-                categories: [],
-                manufacturers: [],
-                products: [],
-                loading: true,
-                selected: {
-                    prices: [],
-                    categories: [],
-                    manufacturers: []
-                }
-            }
+        mounted() {
+            this.loadData();
         },
 
-        mounted() {
-            this.loadCategories();
-            this.loadManufacturers();
-            this.loadPrices();
-            this.loadProducts();
+        computed: {
+            ...mapState([
+                'products',
+                'loading',
+                'categories',
+                'manufacturers',
+                'prices'
+            ]),
+
+            selected: {
+                get () {
+                    return this.$store.state.selected;
+                },
+
+                set (value) {
+                    this.$store.commit('setSelected', value);
+                }
+            }
         },
 
         watch: {
             selected: {
                 handler: function () {
-                    this.loadCategories();
-                    this.loadManufacturers();
-                    this.loadPrices();
-                    this.loadProducts();
+                    this.loadData();
                 },
                 deep: true
             }
         },
 
         methods: {
-            loadCategories: function () {
-                axios.get('/api/categories', {
-                        params: _.omit(this.selected, 'categories')
-                    })
-                    .then((response) => {
-                        this.categories = response.data.data;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
+            ...mapActions([
+                'loadProducts',
+                'loadCategories',
+                'loadManufacturers',
+                'loadPrices'
+            ]),
 
-            loadProducts: function () {
-                axios.get('/api/products', {
-                        params: this.selected
-                    })
-                    .then((response) => {
-                        this.products = response.data.data;
-                        this.loading = false;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-
-            loadManufacturers: function () {
-                axios.get('/api/manufacturers', {
-                        params: _.omit(this.selected, 'manufacturers')
-                    })
-                    .then((response) => {
-                        this.manufacturers = response.data.data;
-                        this.loading = false;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-
-            loadPrices: function () {
-                axios.get('/api/prices', {
-                        params: _.omit(this.selected, 'prices')
-                    })
-                    .then((response) => {
-                        this.prices = response.data;
-                        this.loading = false;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+            loadData: function () {
+                this.loadCategories();
+                this.loadManufacturers();
+                this.loadPrices();
+                this.loadProducts();
             }
         }
     }
