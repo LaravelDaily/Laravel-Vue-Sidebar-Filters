@@ -6,23 +6,30 @@ use App\Product;
 
 class PriceService
 {
-    public function getPrices()
+    private $prices;
+    private $categories;
+    private $manufacturers;
+
+    public function getPrices($prices, $categories, $manufacturers)
     {
-        $prices = [];
+        $this->prices = $prices;
+        $this->categories = $categories;
+        $this->manufacturers = $manufacturers;
+        $formattedPrices = [];
 
         foreach(Product::PRICES as $index => $name) {
-            $prices[] = [
+            $formattedPrices[] = [
                 'name' => $name,
                 'products_count' => $this->getProductCount($index)
             ];
         }
 
-        return $prices;
+        return $formattedPrices;
     }
 
     private function getProductCount($index)
     {
-        return Product::withFilters()
+        return Product::withFilters($this->prices, $this->categories, $this->manufacturers)
             ->when($index == 0, function ($query) {
                 $query->where('price', '<', '5000');
             })

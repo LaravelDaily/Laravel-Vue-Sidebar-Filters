@@ -12,7 +12,11 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::withCount(['products' => function ($query) {
-                $query->withFilters();
+                $query->withFilters(
+                    request()->input('prices', []),
+                    request()->input('categories', []),
+                    request()->input('manufacturers', [])
+                );
             }])
             ->get();
 

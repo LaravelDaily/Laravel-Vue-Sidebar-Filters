@@ -11,7 +11,11 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::withFilters()->get();
+        $products = Product::withFilters(
+            request()->input('prices', []),
+            request()->input('categories', []),
+            request()->input('manufacturers', [])
+        )->get();
 
         return ProductResource::collection($products);
     }

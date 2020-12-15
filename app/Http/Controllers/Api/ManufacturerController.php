@@ -12,7 +12,11 @@ class ManufacturerController extends Controller
     public function index()
     {
         $manufacturers = Manufacturer::withCount(['products' => function ($query) {
-                $query->withFilters();
+                $query->withFilters(
+                    request()->input('prices', []),
+                    request()->input('categories', []),
+                    request()->input('manufacturers', [])
+                );
             }])
             ->get();
 

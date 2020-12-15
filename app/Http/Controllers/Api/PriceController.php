@@ -10,7 +10,11 @@ class PriceController extends Controller
 {
     public function index(PriceService $priceService)
     {
-        $prices = $priceService->getPrices();
+        $prices = $priceService->getPrices(
+            request()->input('prices', []),
+            request()->input('categories', []),
+            request()->input('manufacturers', [])
+        );
 
         return response()->json($prices);
     }
